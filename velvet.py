@@ -78,16 +78,14 @@ def combin_Notes():
     while not success:    
         print("While ran")
         currNode = ""
+        tempNode = ""
         for idx, node in enumerate(nodes):
-            print(node)
-            print(edges[node])
-            print(connectedFrom[node])
             currNode = node
             if( tempNode == "" ):
                 tempNode = node
-            if (node == 0): 
-                print(node)
-            if (len(edges[node]) == 1 and len(connectedFrom[node]) == 1) or (len(edges[node]) == 1 and idx == 1):
+            if(len(edges[node]) == 1 and idx == 0):
+                 tempNode += edges[node][-1]
+            elif (len(edges[node]) == 1 and len(connectedFrom[node]) == 1):
                 tempNode += edges[node][-1]
             elif (idx == len(nodes)-1 and len(connectedFrom[node]) == 1):
                 nodes.remove(currNode)
@@ -95,9 +93,9 @@ def combin_Notes():
                     success = True
                 break  
             else:
-                node.append(tempNode)
-                edges[tempNode] = [node[tempNode[-21]]]
-                connectedFrom[tempNode] = [node[tempNode[21]]]
+                nodes.append(tempNode)
+                edges[tempNode] = [edges[tempNode[-20:]]]
+                connectedFrom[tempNode] = [connectedFrom[tempNode[:20]]]
                 if(idx == len(nodes) -1): 
                     nodes.remove(currNode)
                     success = True
