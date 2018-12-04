@@ -95,7 +95,8 @@ def combin_Notes():
             else:
                 nodes.append(tempNode)
                 edges[tempNode] = [edges[tempNode[-20:]]]
-                connectedFrom[tempNode] = [connectedFrom[tempNode[:20]]]
+                if tempNode[:20] in connectedFrom.keys():
+                    connectedFrom[tempNode] = [connectedFrom[tempNode[:20]]]
                 if(idx == len(nodes) -1): 
                     nodes.remove(currNode)
                     success = True
