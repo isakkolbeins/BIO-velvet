@@ -42,26 +42,25 @@ edges = {}
 
 def de_Brujin_Graph(kmers):
     print(" -> connecting kmers ")
-    for kmer in kmers:
+    for i, kmer in enumerate(kmers):
+        if(i%10000 == 0):
+            print("Done with ", i)
         fromNode = kmer[:-1]
         toNode = kmer[1:]
 
         if fromNode not in nodes:
             nodes.append(fromNode)
             edges[fromNode] = []
-            connectedFrom[toNode] = []
             connectedFrom[fromNode] = []
-        
+
+        if toNode not in nodes:
+            nodes.append(toNode)
+            edges[toNode] = []
+            connectedFrom[toNode] = []
+
         edges[fromNode].append(toNode)
+        connectedFrom[toNode].append(fromNode)
 
-
-    for node in nodes:
-        for edge in edges[node]:
-            if edge not in nodes:
-                nodes.append(edge)
-                edges[edge] = []
-                connectedFrom[edge] = []
-            connectedFrom[edge].append(node)
 
 def combineNode(n):
     toLen = 0
@@ -162,43 +161,6 @@ def createPath(path, currConn):
         return path
 
 
-
-'''def restart():
-    global k, currConn, pStart, pEnd
-    
-    k = graphstart
-    currConn = copy.deepcopy(conn)
-    pStart = []
-    pEnd = []
-
-
-
-pathFound = False
-k = graphstart
-currConn = copy.deepcopy(conn)
-pStart = []
-pEnd = []
-
-while not pathFound:
-        
-    smallPath = createPath([k],currConn)
-    
-    if smallPath[-1] is graphend:
-        path = pStart + smallPath
-    else:
-        path = pStart + smallPath + pEnd
-
-
-    if (len(path) > totEdges):
-        print('->'.join(str(x) for x in path))
-        pathFound = True
-    else:
-        k = random.choice([x for x in path if len(currConn[x]) > 0 and x != graphend])
-        i = path.index(k)
-        pStart = path[:i]
-        pEnd = path[i+1:]
-
-'''
 def main():
     print(" _     _ _______ _     _     _ _______ _______ ")
     print("(_)   (_|_______|_)   (_)   (_|_______|_______)")
@@ -206,25 +168,39 @@ def main():
     print("| |   | |  ___) | |   | |   | |  ___)    | |   ")
     print(" \ \ / /| |_____| |____\ \ / /| |_____   | |   ")
     print("  \___/ |_______)_______)___/ |_______)  |_|   ")
+    print()
 
 
     kmers = readFromFile()
-    ____________________________________
     print("_________________Kmers generated from file_________________")
+    print(len(kmers), " -> Number of kmers")
+    print()
+
     kmers = coverage(kmers)
     print("_____________________Coverage filtered_____________________")
+    print(len(kmers)," -> Number of kmers after coverage filter")
+    print()
+
     de_Brujin_Graph(kmers)
     print("__________________De Brujin Graph created__________________")
+    print(len(nodes), " -> Number of nodes in graph")
+    print()
+
+
     checkPoints = getCheckpoints(nodes)
     print("_____________________Checkpoints found_____________________")
-    #print(len(nodes))
-    #print(len(checkPoints))
+    print(len(nodes), " -> Number of checkpoints in graph")
+    print()
+
     graph = optimiseGraph(checkPoints)
     print("______________________Graph optimised______________________")
-    print(len(graph))
+    print(len(graph)," -> Number of nodes in graph afer optimisation")
+    print()
+
     graph = removeTips(graph)
     print("_______________________Tips removed________________________")
-    print(len(graph))
+    print(len(graph)," -> Number of nodes in graph afer tip removal: ")
+    print()
 
     for k in graph: 
         print(k, " -> ", ','.join(edges[k]))
