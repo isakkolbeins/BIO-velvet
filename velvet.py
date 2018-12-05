@@ -4,7 +4,7 @@ sys.setrecursionlimit(5000)
 
 
 def readFromFile():
-    read1 = open("reads_1.fastq", "r")
+    read1 = open("reads_2.fastq", "r")
     lines1 = read1.read().splitlines()
     k = 21
     dna = []
@@ -12,8 +12,8 @@ def readFromFile():
     counter = 0
     # Lesa inn file, filtera línur sem hafa ekki dan strengina og lengd kmera er 21
     for x, line in enumerate(lines1):
-        if(counter>=1000): 
-            break
+        #if(counter>=1000): 
+            #break
         if not(line[0] == '@' or line[0] == '+' or line[0] == '8'):
             for i in range(len(line)-k):                        
                 kmers.append(line[i:i+k])
@@ -41,6 +41,7 @@ nodes = []
 edges = {}
 
 def de_Brujin_Graph(kmers):
+    print(" -> connecting kmers ")
     for kmer in kmers:
         fromNode = kmer[:-1]
         toNode = kmer[1:]
@@ -53,14 +54,7 @@ def de_Brujin_Graph(kmers):
         
         edges[fromNode].append(toNode)
 
-    # data_struct = []
-    # file = open("testfile.txt","w")
-    # for node in nodes:
-    #     temp = node, ' -> ', ','.join(edges[node])
-    #     data_struct.append((str(node),edges[node]))
-    #     file.write(str(temp))
-    #     file.write('\n')
-    # file.close() 
+
     for node in nodes:
         for edge in edges[node]:
             if edge not in nodes:
@@ -131,7 +125,7 @@ def removeTips(nodes):
         if n in connectedFrom.keys():
             fromLen = len(connectedFrom[n])
 
-        if not((toLen == 0 or fromLen == 0) and len(n) >= 2*21):
+        if not((toLen == 0 or fromLen == 0) and len(n) <= 2*21):
             filtered.append(n)
 
     return filtered
@@ -206,16 +200,34 @@ while not pathFound:
 
 '''
 def main():
+    print(" _     _ _______ _     _     _ _______ _______ ")
+    print("(_)   (_|_______|_)   (_)   (_|_______|_______)")
+    print(" _     _ _____   _     _     _ _____      _    ")
+    print("| |   | |  ___) | |   | |   | |  ___)    | |   ")
+    print(" \ \ / /| |_____| |____\ \ / /| |_____   | |   ")
+    print("  \___/ |_______)_______)___/ |_______)  |_|   ")
+
+
     kmers = readFromFile()
+    ____________________________________
+    print("_________________Kmers generated from file_________________")
     kmers = coverage(kmers)
+    print("_____________________Coverage filtered_____________________")
     de_Brujin_Graph(kmers)
+    print("__________________De Brujin Graph created__________________")
     checkPoints = getCheckpoints(nodes)
+    print("_____________________Checkpoints found_____________________")
     #print(len(nodes))
     #print(len(checkPoints))
     graph = optimiseGraph(checkPoints)
+    print("______________________Graph optimised______________________")
     print(len(graph))
     graph = removeTips(graph)
+    print("_______________________Tips removed________________________")
     print(len(graph))
+
+    for k in graph: 
+        print(k, " -> ", ','.join(edges[k]))
 
 if __name__== "__main__":
     main()
