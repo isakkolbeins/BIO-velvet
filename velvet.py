@@ -68,41 +68,58 @@ def de_Brujin_Graph(kmers):
                 connectedFrom[edge] = []
             connectedFrom[edge] = node
 
+def combineNode(n):
+    toLen = 0
+    fromLen = 0
+    #print("--- n --- ", n)
+    if n[-20:] in edges.keys():
+        toLen = len(edges[n[-20:]])
+        edges[n] = edges[n[-20:]]
 
- 
-def combin_Notes():
-    print("Combining Notes")
-    tempNode = ""
-    #tempNode = node
-    success = False
-    while not success:    
-        print("While ran")
-        currNode = ""
-        tempNode = ""
-        for idx, node in enumerate(nodes):
-            currNode = node
-            if( tempNode == "" ):
-                tempNode = node
-            if(len(edges[node]) == 1 and idx == 0):
-                 tempNode += edges[node][-1]
-            elif (len(edges[node]) == 1 and len(connectedFrom[node]) == 1):
-                tempNode += edges[node][-1]
-            elif (idx == len(nodes)-1 and len(connectedFrom[node]) == 1):
-                nodes.remove(currNode)
-                if(idx == len(nodes) -1): 
-                    success = True
-                break  
-            else:
-                nodes.append(tempNode)
-                edges[tempNode] = [edges[tempNode[-20:]]]
-                if tempNode[:20] in connectedFrom.keys():
-                    connectedFrom[tempNode] = [connectedFrom[tempNode[:20]]]
-                if(idx == len(nodes) -1): 
-                    nodes.remove(currNode)
-                    success = True
-                break
-        nodes.remove(currNode)
-    print(nodes)
+    if n[:20] in connectedFrom.keys():
+        fromLen = len(connectedFrom[n[:20]])
+        connectedFrom[n] = connectedFrom[(n[:20])]
+    
+    if fromLen > 1 or toLen > 1:
+        #Ekki með, break dont save or delete
+        # edges[n] = edges[n[-20:]]
+        # connectedFrom[n] = connectedFrom[n[:20]]
+        return n
+    
+    if toLen == 0:
+        if n[-20:] in nodes:
+            nodes.remove(n[-20:])
+        return n
+    
+    if n[-20:] in nodes:
+        nodes.remove(n[-20:])
+    #print(edges[n][0][-1])
+    return combineNode(n+edges[n][0][-1])
+
+def getCheckpoints(nodes):
+    checkPoints = []
+    for node in nodes:
+            toLen = 0
+            fromLen = 0
+            if node in edges.keys():
+                toLen = len(edges[node])
+            if node in connectedFrom.keys():
+                fromLen = len(connectedFrom[node])
+            
+            if toLen > 1 or fromLen > 1:
+                for n in edges[node]: 
+                    checkPoints.append(n)
+
+            if fromLen < 1:
+                checkPoints.append(node)
+    return checkPoints
+
+
+def optimiseGraph(checkPoints):
+    print(nodes[-10:])
+    for node in checkPoints:
+        nodes.append(combineNode(node))
+    print(nodes[-10:])
         
 #for k in knots:
 #        if (counter[k] < coverage):
@@ -176,7 +193,9 @@ def main():
     kmers = readFromFile()
     kmers = coverage(kmers)
     de_Brujin_Graph(kmers)
-    combin_Notes()
+    checkPoints = getCheckpoints(nodes)
+    #print(checkPoints)
+    optimiseGraph(checkPoints)
 
 if __name__== "__main__":
     main()
