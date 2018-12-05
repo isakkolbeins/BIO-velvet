@@ -18,8 +18,10 @@ def readFromFile():
     for x, line in enumerate(lines1):
         if x%twoPerc == 0:
             print("-", end="", flush=True)
-        #if(counter>=5000): 
-           #break
+        
+        # Þar sem að við virðumst ekki geta höndlað alla gagnaskránna, notum við aðeins hluta hennar
+        if(counter>=10000): 
+           break
         if not(line[0] == '@' or line[0] == '+' or line[0] == '8'):
             for i in range(len(line)-k):                        
                 kmers.append(line[i:i+k])
