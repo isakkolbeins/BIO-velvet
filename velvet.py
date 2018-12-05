@@ -49,6 +49,7 @@ def de_Brujin_Graph(kmers):
             nodes.append(fromNode)
             edges[fromNode] = []
             connectedFrom[toNode] = []
+            connectedFrom[fromNode] = []
         
         edges[fromNode].append(toNode)
 
@@ -66,7 +67,7 @@ def de_Brujin_Graph(kmers):
                 nodes.append(edge)
                 edges[edge] = []
                 connectedFrom[edge] = []
-            connectedFrom[edge] = node
+            connectedFrom[edge].append(node)
 
 def combineNode(n):
     toLen = 0
@@ -105,7 +106,7 @@ def getCheckpoints(nodes):
                 toLen = len(edges[node])
             if node in connectedFrom.keys():
                 fromLen = len(connectedFrom[node])
-            
+           
             if toLen > 1 or fromLen > 1:
                 for n in edges[node]: 
                     checkPoints.append(n)
@@ -116,11 +117,26 @@ def getCheckpoints(nodes):
 
 
 def optimiseGraph(checkPoints):
-    print(nodes[-10:])
     for node in checkPoints:
         nodes.append(combineNode(node))
-    print(nodes[-10:])
-        
+    return nodes
+
+def removeTips(nodes):
+    filtered = []
+    for n in nodes:
+        toLen = 0
+        fromLen = 0
+        if n in edges.keys():
+            toLen = len(edges[n])
+        if n in connectedFrom.keys():
+            fromLen = len(connectedFrom[n])
+
+        if not((toLen == 0 or fromLen == 0) and len(n) >= 2*21):
+            filtered.append(n)
+
+    return filtered
+    
+
 #for k in knots:
 #        if (counter[k] < coverage):
 #                knots.remove(k)
@@ -194,8 +210,12 @@ def main():
     kmers = coverage(kmers)
     de_Brujin_Graph(kmers)
     checkPoints = getCheckpoints(nodes)
-    #print(checkPoints)
-    optimiseGraph(checkPoints)
+    #print(len(nodes))
+    #print(len(checkPoints))
+    graph = optimiseGraph(checkPoints)
+    print(len(graph))
+    graph = removeTips(graph)
+    print(len(graph))
 
 if __name__== "__main__":
     main()
